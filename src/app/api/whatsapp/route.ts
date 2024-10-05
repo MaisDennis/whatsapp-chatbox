@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Twilio } from 'twilio';
 import OpenAI from 'openai';
 
+// Helper function to parse the URL-encoded form data
+async function parseFormData(req: NextRequest) {
+  const bodyText = await req.text();
+  const params = new URLSearchParams(bodyText);
+  const parsedBody: { [key: string]: string } = {};
+  for (const [key, value] of params.entries()) {
+    parsedBody[key] = value;
+  }
+  return parsedBody;
+}
+
 // Set up Twilio client
 const twilioClient = new Twilio(
   process.env.TWILIO_ACCOUNT_SID!,
@@ -16,8 +27,9 @@ const openai = new OpenAI({
 // Handle POST requests to the /api/whatsapp endpoint
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { Body, From } = body;
+    // Parse the URL-encoded form data from Twilio's webhook
+    const body = await parseFormData(req);
+    const { Body, From } = body; // "Body" is the WhatsApp message, "From" is the sender
 
     // Call OpenAI API to generate a response based on the message
     const openaiResponse = await openai.chat.completions.create({
