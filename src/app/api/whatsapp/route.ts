@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
 
     // Use Twilio to send the reply back via WhatsApp
     const twilioResponse = await twilioClient.messages.create({
-      from: 'whatsapp:' + process.env.TWILIO_WHATSAPP_NUMBER,
+      from: process.env.TWILIO_WHATSAPP_NUMBER,
       to: From,
       body: reply,
     });
